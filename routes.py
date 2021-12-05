@@ -1,5 +1,5 @@
-from flask import Blueprint , request, stream_with_context
-from pytube import YouTube, request as rq
+from flask import Blueprint , request, jsonify
+from pytube import YouTube, Search
 
 routes = Blueprint("routes", __name__, static_folder="static", template_folder="templates")
 
@@ -18,3 +18,15 @@ def download_video():
     except Exception as e:
         raise e
 
+@routes.route('/search', methods=['POST'])
+def search_videos():
+    try:
+        key = request.form.get('key')
+        s = Search(key)
+        searchResults = []
+        results = s.results
+        searchResults = [ { "url": yt.watch_url, "title": yt.title , "thumbnail":f"https://img.youtube.com/vi/{yt.video_id}/maxresdefault.jpg" } for yt in results]
+        return jsonify(searchResults)
+
+    except Exception as e:
+        raise e
